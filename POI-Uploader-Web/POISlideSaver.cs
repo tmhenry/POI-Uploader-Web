@@ -17,6 +17,7 @@ namespace POI_Uploader_Web
         POIPresentation presentation;
         string name;
         string presentor;
+        
         public string FolderPath
         {
             get { return folderPath; }
@@ -46,7 +47,7 @@ namespace POI_Uploader_Web
         public  void saveSlideAnimationToPresentation(int slideIndex, List<int> durationList)
         {
             POIAnimationSlide slide = new POIAnimationSlide(durationList, slideIndex, presentation);
-            presentation.Insert(slide);
+            presentation.InsertAnimationSlide(slide);
         }
         public  void saveToPOIFile()
         {

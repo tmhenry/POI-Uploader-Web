@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using POILibCommunication;
-namespace POIUploader
+namespace POI_Uploader_Web
 {
     class POIFileReader
     {

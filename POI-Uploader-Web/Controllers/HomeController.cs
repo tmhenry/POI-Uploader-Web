@@ -17,6 +17,8 @@ namespace POI_Uploader_Web.Controllers
         {
             String presentor = "unknown";
             String description = "unknown";
+            
+            
 
             if (Request.Form.AllKeys.Contains("presentor"))
             {
@@ -54,6 +56,10 @@ namespace POI_Uploader_Web.Controllers
                     case @".PPTX":
                     case @".pptx":
                         POIPPTProcessor.Process(savedFn, presentor, description);
+                        break;
+                    case @".POI":
+                        POIFileReader reader = new POIFileReader(savedFn);
+                        reader.GetImageAndAnimationFromFile();
                         break;
                 }
 
