@@ -30,7 +30,7 @@ namespace POI_Uploader_Web
 
             pptID = slideNumberCounter++;
 
-            folderPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, pptID.ToString());
+            folderPath = POIArchive.ArchiveHome + pptID; 
             Directory.CreateDirectory(folderPath);
 
             name = presName;
