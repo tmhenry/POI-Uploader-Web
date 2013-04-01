@@ -40,8 +40,7 @@ namespace POI_Uploader_Web.Controllers
 
                 String presFn = Path.GetFileName(hpf.FileName);
 
-                String savedFn = POIArchive.ArchiveHome + presFn;
-
+                String savedFn = Path.Combine(POIArchive.ArchiveHome, presFn);
 
                 hpf.SaveAs(savedFn);
 

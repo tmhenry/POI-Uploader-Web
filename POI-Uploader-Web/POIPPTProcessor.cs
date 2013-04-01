@@ -84,10 +84,14 @@ namespace POI_Uploader_Web
                     container.Close();
                 }
             
-                saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
-                if (animationCount>0)
+                
+                if (animationCount > 0)
                 {
                     saver.saveSlideAnimationToPresentation(curSlide.SlideIndex - 1, durationList);
+                }
+                else
+                {
+                    saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
                 }
 
                 

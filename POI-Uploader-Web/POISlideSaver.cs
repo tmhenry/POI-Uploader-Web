@@ -31,7 +31,7 @@ namespace POI_Uploader_Web
 
             pptID = slideNumberCounter++;
 
-            folderPath = POIArchive.ArchiveHome + pptID; 
+            folderPath = Path.Combine(POIArchive.ArchiveHome, pptID.ToString()); 
             Directory.CreateDirectory(folderPath);
 
             name = presName;
@@ -47,7 +47,7 @@ namespace POI_Uploader_Web
         public  void saveSlideAnimationToPresentation(int slideIndex, List<int> durationList)
         {
             POIAnimationSlide slide = new POIAnimationSlide(durationList, slideIndex, presentation);
-            presentation.InsertAnimationSlide(slide);
+            presentation.Insert(slide);
         }
         public  void saveToPOIFile()
         {
