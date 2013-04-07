@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.IO;
 using POILibCommunication;
+using System.Diagnostics;
 
 
 namespace POI_Uploader_Web
@@ -82,6 +83,13 @@ namespace POI_Uploader_Web
                     }
 
                     container.Close();
+
+                    //Once the video creation is done, convert it to wmv
+                    Thread convThread = new Thread(StartVideoConversion);
+                    String [] param = new String[2];
+                    param[0] = folderPath;
+                    param[1] = (curSlide.SlideIndex-1).ToString();
+                    convThread.Start(param);
                 }
             
                 
@@ -103,6 +111,31 @@ namespace POI_Uploader_Web
 
             saver.saveToPOIFile();
             myApp.Quit();
+        }
+
+        private static void StartVideoConversion(object data)
+        {
+            String[] param = data as String[];
+            String folderPath = param[0];
+            String fileName = param[1];
+
+            String inputFN = Path.Combine(folderPath, fileName + ".wmv");
+            String outputFN = Path.Combine(folderPath, fileName + ".mp4");
+
+            //Start a cmd process which trigger ffmpeg
+            Process process = new Process();
+
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+
+            //Important: specify the options for ffmpeg
+            //The PIPE_NAME is already defined so can be used here as input file
+            //"/C" let the console close after operation completes
+            startInfo.Arguments = "/C ffmpeg -i " + inputFN + " -c:v libx264 -preset ultrafast " + outputFN;
+
+            process.StartInfo = startInfo;
+            process.Start();
         }
 
         
