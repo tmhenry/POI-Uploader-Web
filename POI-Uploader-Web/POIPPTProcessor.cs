@@ -132,8 +132,7 @@ namespace POI_Uploader_Web
             //Important: specify the options for ffmpeg
             //The PIPE_NAME is already defined so can be used here as input file
             //"/C" let the console close after operation completes
-            startInfo.Arguments = "/C ffmpeg -i " + inputFN + " -c:v libx264 -preset ultrafast " + outputFN;
-
+            startInfo.Arguments = "/C ffmpeg -i " + inputFN + " -f mp4 -acodec libfaac -ab 128k -ar 48000 -ac 2 -vcodec libx264 " + outputFN;
             process.StartInfo = startInfo;
             process.Start();
         }
