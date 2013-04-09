@@ -86,12 +86,11 @@ namespace POI_Uploader_Web
 
                     container.Close();
 
-                    //Once the video creation is done, convert it to wmv
-                    Thread convThread = new Thread(StartVideoConversion);
+                    //Once the video creation is done, convert it to wmv, wait until completion
                     String [] param = new String[2];
                     param[0] = folderPath;
                     param[1] = (curSlide.SlideIndex-1).ToString();
-                    convThread.Start(param);
+                    StartVideoConversion(param);
                 }
             
                 
@@ -103,7 +102,6 @@ namespace POI_Uploader_Web
                 {
                     saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
                 }
-
                 
             }
 
@@ -137,6 +135,8 @@ namespace POI_Uploader_Web
             startInfo.Arguments = "/C ffmpeg -i " + inputFN + " -f mp4 -acodec libfaac -ab 128k -ar 48000 -ac 2 -vcodec libx264 " + outputFN;
             process.StartInfo = startInfo;
             process.Start();
+
+            process.WaitForExit();
         }
 
         
