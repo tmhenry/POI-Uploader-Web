@@ -8,6 +8,7 @@ using System.IO;
 using POILibCommunication;
 using Communication;
 using System.Threading;
+using System.Diagnostics;
 
 namespace POI_Uploader_Web.Controllers
 {
@@ -65,6 +66,9 @@ namespace POI_Uploader_Web.Controllers
             String presentor = param[2];
             String description = param[3];
 
+            Stopwatch uploadTime = new Stopwatch();
+            uploadTime.Start();
+
             switch (extName)
             {
                 case @".PDF":
@@ -82,6 +86,9 @@ namespace POI_Uploader_Web.Controllers
                     reader.GetImageAndAnimationFromFile();
                     break;
             }
+
+            uploadTime.Stop();
+            Console.WriteLine("Time used for uploading:" + uploadTime.Elapsed);
         }
     }
 }
