@@ -51,6 +51,8 @@ namespace POI_Uploader_Web
                 string savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex)+".PNG";
                 FileStream ins = new FileStream(savedFileName, FileMode.Open, FileAccess.Read);
                 FileStream os = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
+
+                //Copy to the local disk
                 ins.CopyTo(os);
                 os.Flush();
 

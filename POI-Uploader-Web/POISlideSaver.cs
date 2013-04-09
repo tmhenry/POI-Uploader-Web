@@ -43,6 +43,10 @@ namespace POI_Uploader_Web
         {
             POIStaticSlide slide = new POIStaticSlide(slideIndex, presentation);
             presentation.Insert(slide);
+
+            //Upload the image to the content server
+            string savedFileName = Path.Combine(FolderPath, slideIndex.ToString() + ".PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
         }
         public  void saveSlideAnimationToPresentation(int slideIndex, List<int> durationList)
         {
@@ -66,6 +70,9 @@ namespace POI_Uploader_Web
             bw.Close();
 
             writeStream.Close();
+
+            //Upload to the content server
+            POIContentServerHelper.uploadContent(presentation.PresID, fileName);
 
             Console.WriteLine("presID of slides is" + presentation.PresID);
         }

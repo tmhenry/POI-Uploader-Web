@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.IO;
 
+using POILibCommunication;
+
 namespace POI_Uploader_Web
 {
     class POIPDFProcessor
@@ -51,10 +53,13 @@ namespace POI_Uploader_Web
 
                 //Take the screen shot  q
                 myStream = ScreenShot.TakeScreenShot(pdfProcess);
-                fs = File.OpenWrite(saver.FolderPath + @"/" + i + @".png");
+                String savedFileName = saver.FolderPath + @"/" + i + @".png";
+                fs = File.OpenWrite(savedFileName);
                 myStream.WriteTo(fs);
                 fs.Close();
                 saver.saveSlideImageToPresentation(i);
+
+                
             }
             pdfProcess.CloseMainWindow();
             saver.saveToPOIFile();
