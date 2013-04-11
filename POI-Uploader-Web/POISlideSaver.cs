@@ -48,8 +48,11 @@ namespace POI_Uploader_Web
             POIAnimationSlide slide = new POIAnimationSlide(durationList, slideIndex, presentation);
             presentation.Insert(slide);
 
-            string savedFileName = Path.Combine(FolderPath, slideIndex.ToString() + ".mp4");
-            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+            string savedAnimationName = Path.Combine(FolderPath, slideIndex.ToString() + ".mp4");
+            string savedCoverName = Path.Combine(FolderPath, slideIndex.ToString() + ".PNG");
+
+            POIContentServerHelper.uploadContent(presentation.PresID, savedAnimationName);
+            POIContentServerHelper.uploadContent(presentation.PresID, savedCoverName);
         }
         public  void saveToPOIFile()
         {
