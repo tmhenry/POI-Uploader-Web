@@ -10,7 +10,6 @@ namespace POI_Uploader_Web
 {
     class POISlideSaver
     {
-        static int slideNumberCounter = 0;
 
         int pptID;
         string folderPath;
@@ -24,12 +23,8 @@ namespace POI_Uploader_Web
         }
         public POISlideSaver(string presName, string presPresentor)
         {
-            
-            //pptID = Properties.Settings.Default.SlideNumberCounter;
-            //Properties.Settings.Default.SlideNumberCounter++;
-            //Properties.Settings.Default.Save();
-
-            pptID = slideNumberCounter++;
+            //Register the content to the content server and retrieve its ID
+            pptID = POIWebService.UploadPresentation(presName, presPresentor);
 
             folderPath = Path.Combine(POIArchive.ArchiveHome, pptID.ToString()); 
             Directory.CreateDirectory(folderPath);
