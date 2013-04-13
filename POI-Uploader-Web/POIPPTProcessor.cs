@@ -95,8 +95,7 @@ namespace POI_Uploader_Web
                     param[1] = (curSlide.SlideIndex-1).ToString();
                     StartVideoConversion(param);
 
-                    Marshal.ReleaseComObject(container);
-                    Marshal.ReleaseComObject(curAnimationSequence);
+                 
                 }
             
                 
@@ -109,7 +108,7 @@ namespace POI_Uploader_Web
                     saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
                 }
 
-                Marshal.ReleaseComObject(curSlide);
+               
                 
             }
 
@@ -123,14 +122,12 @@ namespace POI_Uploader_Web
             
 
             sourcePre.Close();
-            Marshal.ReleaseComObject(sourcePre);
-
-            Marshal.ReleaseComObject(myPres);
+           
 
             saver.saveToPOIFile();
 
             myApp.Quit();
-            Marshal.ReleaseComObject(myApp);
+            
         }
 
         private static void StartVideoConversion(object data)
