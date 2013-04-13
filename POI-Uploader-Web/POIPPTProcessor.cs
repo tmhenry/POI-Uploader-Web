@@ -56,6 +56,9 @@ namespace POI_Uploader_Web
                 ins.CopyTo(os);
                 os.Flush();
 
+                ins.Close();
+                os.Close();
+
                 int animationCount = curSlide.TimeLine.MainSequence.Count;
                 if (animationCount > 0)
                 {
