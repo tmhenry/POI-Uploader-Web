@@ -21,18 +21,20 @@ namespace POI_Uploader_Web
         {
             get { return folderPath; }
         }
-        public POISlideSaver(string presName, string presPresentor)
+        public POISlideSaver(string presName, string description, int presId)
         {
             //Register the content to the content server and retrieve its ID
-            pptID = POIWebService.UploadPresentation(presName, presPresentor);
+            //pptID = POIWebService.UploadPresentation(presName, description);
+            pptID = presId;
+
 
             folderPath = Path.Combine(POIArchive.ArchiveHome, pptID.ToString()); 
             Directory.CreateDirectory(folderPath);
 
             name = presName;
-            presentor = presPresentor;
+            presentor = description;
 
-            presentation = new POIPresentation(pptID, name, presentor);
+            presentation = new POIPresentation(pptID, name, description);
         }
         public  void saveSlideImageToPresentation(int slideIndex)
         {

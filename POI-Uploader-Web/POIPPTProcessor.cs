@@ -21,10 +21,10 @@ namespace POI_Uploader_Web
         static string folderPath;
         static POISlideSaver saver;
         
-        public static void Process(String fn,string nameFromTextBox, string presentorFromTextBox)
+        public static void Process(String fn,string name, string description, int presId)
         {
 
-            saver = new POISlideSaver(nameFromTextBox, presentorFromTextBox);
+            saver = new POISlideSaver(name, description, presId);
 
             folderPath = saver.FolderPath;
             

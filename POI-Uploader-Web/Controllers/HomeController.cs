@@ -17,12 +17,14 @@ namespace POI_Uploader_Web.Controllers
         
         public ActionResult UploadPresentation()
         {
-            String presentor = "unknown";
+            String name = "unknown";
             String description = "unknown";
+            String creator = "unknown";
+            String type = "public";
             
-            if (Request.Form.AllKeys.Contains("presentor"))
+            if (Request.Form.AllKeys.Contains("name"))
             {
-                presentor = Request.Form["presentor"];
+                name = Request.Form["name"];
             }
 
             if (Request.Form.AllKeys.Contains("description"))
@@ -30,32 +32,51 @@ namespace POI_Uploader_Web.Controllers
                 description = Request.Form["description"];
             }
 
-            foreach (string file in Request.Files)
+            if (Request.Form.AllKeys.Contains("creator"))
             {
-                
-                HttpPostedFileBase hpf = Request.Files[file] as HttpPostedFileBase;
-
-                //Ignore the file if the length is zero
-                if (hpf.ContentLength == 0) continue;
-
-                String presFn = Path.GetFileName(hpf.FileName);
-
-                String savedFn = Path.Combine(POIArchive.ArchiveHome, presFn);
-
-                hpf.SaveAs(savedFn);
-
-                //Create a new thread and start handling
-                String[] param = new String[4];
-                param[0] = Path.GetExtension(presFn);
-                param[1] = savedFn;
-                param[2] = presentor;
-                param[3] = description;
-
-                Thread fileHandler = new Thread(HandleUploadedFile);
-                fileHandler.Start(param);
+                creator = Request.Form["creator"];
             }
 
-            return Json("Presentation files processed!");
+            if (Request.Form.AllKeys.Contains("type"))
+            {
+                type = Request.Form["type"];
+            }
+
+            int pptID = POIWebService.UploadPresentation(name, description);
+
+            if (pptID > 0)
+            {
+                foreach (string file in Request.Files)
+                {
+
+                    HttpPostedFileBase hpf = Request.Files[file] as HttpPostedFileBase;
+
+                    //Ignore the file if the length is zero
+                    if (hpf.ContentLength == 0) continue;
+
+                    String presFn = Path.GetFileName(hpf.FileName);
+
+                    String savedFn = Path.Combine(POIArchive.ArchiveHome, presFn);
+
+                    hpf.SaveAs(savedFn);
+
+                    //Create a new thread and start handling
+                    String[] param = new String[5];
+                    param[0] = Path.GetExtension(presFn);
+                    param[1] = savedFn;
+                    param[2] = name;
+                    param[3] = description;
+                    param[4] = pptID.ToString();
+
+                    Thread fileHandler = new Thread(HandleUploadedFile);
+                    fileHandler.Start(param);
+                }
+            }
+
+            Dictionary<string, string> response = new Dictionary<string, string>();
+            response["presId"] = pptID.ToString();
+
+            return Json(response);
         }
 
         private void HandleUploadedFile(object arg)
@@ -63,8 +84,9 @@ namespace POI_Uploader_Web.Controllers
             String[] param = arg as String[];
             String extName = param[0];
             String savedFn = param[1];
-            String presentor = param[2];
+            String name = param[2];
             String description = param[3];
+            int presId = Int32.Parse(param[4]);
 
             Stopwatch uploadTime = new Stopwatch();
             uploadTime.Start();
@@ -73,13 +95,13 @@ namespace POI_Uploader_Web.Controllers
             {
                 case @".PDF":
                 case @".pdf":
-                    POIPDFProcessor.Process(savedFn, presentor, description);
+                    POIPDFProcessor.Process(savedFn, name, description, presId);
                     break;
                 case @".PPT":
                 case @".ppt":
                 case @".PPTX":
                 case @".pptx":
-                    POIPPTProcessor.Process(savedFn, presentor, description);
+                    POIPPTProcessor.Process(savedFn, name, description, presId);
                     break;
                 case @".POI":
                     POIFileReader reader = new POIFileReader(savedFn);

@@ -16,10 +16,10 @@ namespace POI_Uploader_Web
     class POIPDFProcessor
     {
         static POISlideSaver saver;
-        public static void Process(String fn,string nameFromTextBox, string presentorFromTextBox)
+        public static void Process(String fn,string name, string description, int presId)
         {
 
-            saver = new POISlideSaver(nameFromTextBox, presentorFromTextBox);
+            saver = new POISlideSaver(name, description, presId);
             //Determine the page count
             StreamReader sr = new StreamReader(File.OpenRead(fn));
             Regex regex = new Regex(@"/Type\s*/Page[^s]");
