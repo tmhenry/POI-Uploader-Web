@@ -17,32 +17,34 @@ namespace POI_Uploader_Web.Controllers
         
         public ActionResult UploadPresentation()
         {
-            String name = "unknown";
-            String description = "unknown";
-            String creator = "unknown";
-            String type = "public";
+            Dictionary<string, string> presInfo = new Dictionary<string, string>();
+
+            presInfo["name"] = "unknown";
+            presInfo["description"] = "unknown";
+            //presInfo["creator"] = "unknown";
+            presInfo["type"] = "public";
             
             if (Request.Form.AllKeys.Contains("name"))
             {
-                name = Request.Form["name"];
+                presInfo["name"] = Request.Form["name"];
             }
 
             if (Request.Form.AllKeys.Contains("description"))
             {
-                description = Request.Form["description"];
+                presInfo["description"] = Request.Form["description"];
             }
 
             if (Request.Form.AllKeys.Contains("creator"))
             {
-                creator = Request.Form["creator"];
+                //presInfo["creator"] = Request.Form["creator"];
             }
 
             if (Request.Form.AllKeys.Contains("type"))
             {
-                type = Request.Form["type"];
+                presInfo["type"] = Request.Form["type"];
             }
 
-            int pptID = POIWebService.UploadPresentation(name, description);
+            int pptID = POIWebService.UploadPresentation(presInfo);
 
             if (pptID > 0)
             {
@@ -64,8 +66,8 @@ namespace POI_Uploader_Web.Controllers
                     String[] param = new String[5];
                     param[0] = Path.GetExtension(presFn);
                     param[1] = savedFn;
-                    param[2] = name;
-                    param[3] = description;
+                    param[2] = presInfo["name"];
+                    param[3] = presInfo["description"];
                     param[4] = pptID.ToString();
 
                     Thread fileHandler = new Thread(HandleUploadedFile);
