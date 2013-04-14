@@ -64,14 +64,26 @@ namespace POI_Uploader_Web
                 {
                     PowerPoint.Sequence curAnimationSequence = curSlide.TimeLine.MainSequence;
                     float totalTime = 0;
+                    float curDuration = 0;
+
                     foreach (PowerPoint.Effect effect in curAnimationSequence)
                     {
-                        Console.WriteLine(effect.Timing.Duration);
+                        if (curDuration == 0)
+                        {
+                            curDuration += effect.Timing.Duration;
+                        }
+                        else
+                        {
+                            if (effect.Timing.TriggerType == PowerPoint.MsoAnimTriggerType.msoAnimTriggerOnPageClick)
+                            {
+                                durationList.Add((int)curDuration);
+                                curDuration = 0;
+                            }
+
+                            curDuration += effect.Timing.Duration;
+                        }
 
                         totalTime += effect.Timing.Duration;
-
-                        durationList.Add((int)effect.Timing.Duration);
-                        break;
                     }
 
                     
