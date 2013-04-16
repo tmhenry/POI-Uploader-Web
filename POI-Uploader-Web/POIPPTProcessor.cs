@@ -106,7 +106,7 @@ namespace POI_Uploader_Web
                     param[0] = folderPath;
                     param[1] = (curSlide.SlideIndex-1).ToString();
                     StartVideoConversion(param);
-
+                    GetMouseClickImageFromSlideAccordingToTime(curSlide.SlideIndex, durationList,(int)totalTime);
                  
                 }
             
@@ -168,7 +168,51 @@ namespace POI_Uploader_Web
             process.WaitForExit();
         }
 
-        
+        private static void GetMouseClickImageFromSlideAccordingToTime(int slideIndex, List<int> mouseClickTimeList,int totalTime)
+        {
+            String movieName = folderPath +"/"+ (slideIndex - 1) + ".wmv";
+            int mouseClickTime = 0;
+            int mouseClickIndex = 0;
+            for (mouseClickIndex=0;mouseClickIndex<mouseClickTimeList.Count; mouseClickIndex++)
+            {
+                mouseClickTime += mouseClickTimeList[mouseClickIndex];
+                ExtractImageFromMovieUseFFmpeg(mouseClickIndex, slideIndex, mouseClickTime, movieName);
+            }
+            GetLastImageOfTheMovie(mouseClickIndex, slideIndex, totalTime, movieName);
+
+        }
+
+        private static void GetLastImageOfTheMovie(int lastImageIndex,int slideIndex, int totalTime, String movieName)
+        {
+            ExtractImageFromMovieUseFFmpeg(lastImageIndex, slideIndex, totalTime, movieName);
+        }
+        private static void ExtractImageFromMovieUseFFmpeg(int imageIndex, int slideIndex, int mouseClickTime, String movieName)
+        {
+            String imageName = folderPath + "/" + slideIndex + "_" + imageIndex + ".png";
+            String ffmpegImageExtractionCommand = "/C ffmpeg -i " + movieName + " -ss " + TimeFormatForFFmpeg(mouseClickTime) + " -f image2 -vframes 1 " + imageName;
+
+            ExecuteFFmpegImageCommand(ffmpegImageExtractionCommand);
+        }
+        private static String TimeFormatForFFmpeg(int totalSeconds)
+        {
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds - 3600 * hours) / 60;
+            int seconds = (totalSeconds - 3600 * hours - 60 * minutes);
+
+            return String.Format("{0:00}:{1:00}:{2:00}", hours, minutes, seconds);
+        }
+        private static void ExecuteFFmpegImageCommand(String command)
+        {
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+
+            //"/C" let the console close after operation completes
+            startInfo.Arguments = command;
+            process.StartInfo = startInfo;
+            process.Start();
+        }
         private static void StartScreenShot(object data)
         {
             IntPtr handle = (IntPtr)data;
