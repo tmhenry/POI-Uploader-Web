@@ -60,6 +60,18 @@ namespace POI_Uploader_Web
                 ins.Close();
                 os.Close();
 
+                PowerPoint.Shapes shapes = curSlide.Shapes;
+                foreach(PowerPoint.Shape shape in shapes)
+                
+                {
+                    if (shape.HasTextFrame == Office.MsoTriState.msoTrue)
+                    {
+                        String text = shape.TextFrame.TextRange.Text;
+                        Console.Write(text);
+                    }
+                }
+
+
                 int animationCount = curSlide.TimeLine.MainSequence.Count;
                 if (animationCount > 0)
                 {
