@@ -11,6 +11,7 @@ using System.Threading;
 using System.IO;
 using POILibCommunication;
 using System.Diagnostics;
+using System.Collections;
 
 
 namespace POI_Uploader_Web
@@ -65,6 +66,8 @@ namespace POI_Uploader_Web
                     PowerPoint.Sequence curAnimationSequence = curSlide.TimeLine.MainSequence;
                     float totalTime = 0;
                     float curDuration = 0;
+                    float allButLastDuration = 0;
+                    System.Collections.IEnumerator enumerator = curAnimationSequence.GetEnumerator();
 
                     foreach (PowerPoint.Effect effect in curAnimationSequence)
                     {
@@ -77,6 +80,7 @@ namespace POI_Uploader_Web
                             if (effect.Timing.TriggerType == PowerPoint.MsoAnimTriggerType.msoAnimTriggerOnPageClick)
                             {
                                 durationList.Add((int)curDuration);
+                                allButLastDuration += curDuration;
                                 curDuration = 0;
                             }
 
@@ -85,6 +89,8 @@ namespace POI_Uploader_Web
 
                         totalTime += effect.Timing.Duration;
                     }
+                    durationList.Add((int)(totalTime - allButLastDuration));
+
 
                     
                     container = myPres.Add(Office.MsoTriState.msoTrue);
