@@ -12,6 +12,7 @@ using System.IO;
 using POILibCommunication;
 using System.Diagnostics;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 
 namespace POI_Uploader_Web
@@ -21,12 +22,14 @@ namespace POI_Uploader_Web
         
         static string folderPath;
         static POISlideSaver saver;
+        static int presID;
         
         public static void Process(String fn,string name, string description, int presId)
         {
+            presID = presID;
 
             saver = new POISlideSaver(name, description, presId);
-
+            
             folderPath = saver.FolderPath;
             
             PowerPoint.Application myApp = new PowerPoint.Application();
@@ -60,17 +63,8 @@ namespace POI_Uploader_Web
                 ins.Close();
                 os.Close();
 
-                PowerPoint.Shapes shapes = curSlide.Shapes;
-                foreach(PowerPoint.Shape shape in shapes)
-                
-                {
-                    if (shape.HasTextFrame == Office.MsoTriState.msoTrue)
-                    {
-                        String text = shape.TextFrame.TextRange.Text;
-                        Console.Write(text);
-                    }
-                }
 
+                GetTextCommentsOnEachSlideAndStoreToFile(curSlide);
 
                 int animationCount = curSlide.TimeLine.MainSequence.Count;
                 if (animationCount > 0)
@@ -156,8 +150,56 @@ namespace POI_Uploader_Web
 
             saver.saveToPOIFile();
 
+            foreach (Process process in System.Diagnostics.Process.GetProcessesByName("POWERPNT.EXE"))
+            {
+                process.Kill();
+            }
             myApp.Quit();
             
+        }
+
+        private static void GetTextCommentsOnEachSlideAndStoreToFile(PowerPoint.Slide slide)
+        {
+            PowerPoint.Shapes shapes = slide.Shapes;
+            foreach (PowerPoint.Shape shape in shapes)
+            {
+                if (shape.HasTextFrame == Office.MsoTriState.msoTrue)
+                {
+                    String text = shape.TextFrame.TextRange.Text;
+                    StoreStringToFileWithPresIDAndIndex(slide.SlideIndex, text);
+                     
+                }
+            }
+        }
+        private static void StoreStringToFileWithPresIDAndIndex(int index,string text)
+        {
+            
+
+            text = ReplaceNoAlphanumericWithSpace(text);
+
+            if (!String.IsNullOrWhiteSpace(text))
+            {
+                WriteProcessedTextToFile(index, text);
+            }
+        }
+
+        private static void WriteProcessedTextToFile(int index, string text)
+        {
+            FileStream keywordFileStream = new FileStream(Path.Combine(POIArchive.ArchiveHome,
+                POIGlobalVar.KeywordsFileName), FileMode.Append);
+            TextWriter stringTextWriter = new StreamWriter(keywordFileStream);
+            String stringWithPresIDAndIndex = presID + " " + index + " " + text;
+            stringTextWriter.WriteLine(stringWithPresIDAndIndex);
+            stringTextWriter.Close();
+            keywordFileStream.Close();
+        }
+        private static string ReplaceNoAlphanumericWithSpace(string text)
+        {
+            text = text.Replace(System.Environment.NewLine, " ").Replace("\r", " ");
+            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+            text = rgx.Replace(text, " ");
+
+            return text;
         }
 
         private static void StartVideoConversion(object data)
