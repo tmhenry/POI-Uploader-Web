@@ -75,8 +75,13 @@ namespace POI_Uploader_Web
                     float allButLastDuration = 0;
                     System.Collections.IEnumerator enumerator = curAnimationSequence.GetEnumerator();
 
+                    FileStream stream = new FileStream(Path.Combine(POIArchive.ArchiveHome, "effect.txt"),FileMode.Create);
+                    StreamWriter writer = new StreamWriter(stream);
+
                     foreach (PowerPoint.Effect effect in curAnimationSequence)
                     {
+                        writer.WriteLine(effect.Timing.TriggerType+"   "+effect.Timing.Duration+"  "+effect.Timing.TriggerDelayTime);
+
                         if (curDuration == 0)
                         {
                             curDuration += effect.Timing.Duration;
@@ -85,7 +90,7 @@ namespace POI_Uploader_Web
                         {
                             if (effect.Timing.TriggerType == PowerPoint.MsoAnimTriggerType.msoAnimTriggerOnPageClick)
                             {
-                                durationList.Add((int)curDuration);
+                                durationList.Add((int)(curDuration*1000));
                                 allButLastDuration += curDuration;
                                 curDuration = 0;
                             }
@@ -95,7 +100,10 @@ namespace POI_Uploader_Web
 
                         totalTime += effect.Timing.Duration;
                     }
-                    durationList.Add((int)(totalTime - allButLastDuration));
+
+                    writer.Close();
+                    stream.Close();
+                    durationList.Add((int)((totalTime - allButLastDuration)*1000));
 
 
                     
@@ -105,7 +113,7 @@ namespace POI_Uploader_Web
                     container.Windows[1].Activate();
                     myApp.CommandBars.ExecuteMso(@"PasteSourceFormatting");
 
-                    container.CreateVideo(folderPath + "/" + (curSlide.SlideIndex-1)+".wmv", true, (int) totalTime);
+                    container.CreateVideo(folderPath + "/" + (curSlide.SlideIndex-1)+".wmv", true, (int)Math.Ceiling(totalTime));
                     while (container.CreateVideoStatus != PowerPoint.PpMediaTaskStatus.ppMediaTaskStatusDone)
                     {
                         Thread.Sleep(1000);
@@ -118,7 +126,7 @@ namespace POI_Uploader_Web
                     param[0] = folderPath;
                     param[1] = (curSlide.SlideIndex-1).ToString();
                     StartVideoConversion(param);
-                    GetMouseClickImageFromSlideAccordingToTime(curSlide.SlideIndex, durationList,(int)totalTime);
+                    //GetMouseClickImageFromSlideAccordingToTime(curSlide.SlideIndex, durationList,(int)totalTime);
                  
                 }
             
@@ -132,8 +140,8 @@ namespace POI_Uploader_Web
                     saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
                 }
 
-               
-                
+
+                saver.uploadSlideKeywordsToServer(curSlide.SlideIndex - 1);
             }
 
             DateTime endTime = DateTime.Now;
@@ -185,8 +193,9 @@ namespace POI_Uploader_Web
 
         private static void WriteProcessedTextToFile(int index, string text)
         {
-            FileStream keywordFileStream = new FileStream(Path.Combine(POIArchive.ArchiveHome,
-                POIGlobalVar.KeywordsFileName), FileMode.Append);
+            String fileName = Path.Combine(folderPath, (index-1).ToString() + POIGlobalVar.KeywordsFileType);
+            FileStream keywordFileStream = new FileStream(fileName, FileMode.Append);
+
             TextWriter stringTextWriter = new StreamWriter(keywordFileStream);
             String stringWithPresIDAndIndex = presID + " " + index + " " + text;
             stringTextWriter.WriteLine(stringWithPresIDAndIndex);
