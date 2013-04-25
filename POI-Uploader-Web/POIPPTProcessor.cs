@@ -23,10 +23,11 @@ namespace POI_Uploader_Web
         static string folderPath;
         static POISlideSaver saver;
         static int presID;
+        static String keywordsFileName;
         
         public static void Process(String fn,string name, string description, int presId)
         {
-            presID = presID;
+            presID = presId;
 
             saver = new POISlideSaver(name, description, presId);
             
@@ -43,10 +44,10 @@ namespace POI_Uploader_Web
 
             
             String fileName;
-
             DateTime startTime = DateTime.Now;
 
             sourcePre.SaveAs(folderPath, PowerPoint.PpSaveAsFileType.ppSaveAsPNG);
+            keywordsFileName = Path.Combine(folderPath, presID.ToString() + POIGlobalVar.KeywordsFileType);
 
             foreach (PowerPoint.Slide curSlide in sourcePre.Slides)
             {
@@ -141,7 +142,7 @@ namespace POI_Uploader_Web
                 }
 
 
-                saver.uploadSlideKeywordsToServer(curSlide.SlideIndex - 1);
+                
             }
 
             DateTime endTime = DateTime.Now;
@@ -154,8 +155,8 @@ namespace POI_Uploader_Web
             
 
             sourcePre.Close();
-           
 
+            saver.uploadSlideKeywordsToServer();
             saver.saveToPOIFile();
 
             foreach (Process process in System.Diagnostics.Process.GetProcessesByName("POWERPNT.EXE"))
@@ -193,8 +194,7 @@ namespace POI_Uploader_Web
 
         private static void WriteProcessedTextToFile(int index, string text)
         {
-            String fileName = Path.Combine(folderPath, (index-1).ToString() + POIGlobalVar.KeywordsFileType);
-            FileStream keywordFileStream = new FileStream(fileName, FileMode.Append);
+            FileStream keywordFileStream = new FileStream(keywordsFileName, FileMode.Append);
 
             TextWriter stringTextWriter = new StreamWriter(keywordFileStream);
             String stringWithPresIDAndIndex = presID + " " + index + " " + text;

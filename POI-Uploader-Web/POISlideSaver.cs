@@ -57,9 +57,9 @@ namespace POI_Uploader_Web
             POIContentServerHelper.uploadContent(presentation.PresID, savedCoverName);
         }
 
-        public void uploadSlideKeywordsToServer(int slideIndex)
+        public void uploadSlideKeywordsToServer()
         {
-            string keywordsName = Path.Combine(folderPath, slideIndex.ToString() + POIGlobalVar.KeywordsFileType);
+            string keywordsName = Path.Combine(folderPath, presentation.PresID + POIGlobalVar.KeywordsFileType);
             POIContentServerHelper.uploadContent(presentation.PresID, keywordsName);
         }
         public  void saveToPOIFile()
