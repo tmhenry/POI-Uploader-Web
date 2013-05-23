@@ -115,9 +115,25 @@ namespace POI_Uploader_Web
                     myApp.CommandBars.ExecuteMso(@"PasteSourceFormatting");
 
                     container.CreateVideo(folderPath + "/" + (curSlide.SlideIndex-1)+".wmv", true, (int)Math.Ceiling(totalTime));
-                    while (container.CreateVideoStatus != PowerPoint.PpMediaTaskStatus.ppMediaTaskStatusDone)
+                    while (true)
                     {
-                        Thread.Sleep(1000);
+                        try{
+                            if(container.CreateVideoStatus != PowerPoint.PpMediaTaskStatus.ppMediaTaskStatusDone)
+                            {
+                                Thread.Sleep(1000);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Console.WriteLine("Come on exception!");
+                            Thread.Sleep(1000);
+                            continue;
+                        }
+                        
                     }
 
                     container.Close();
