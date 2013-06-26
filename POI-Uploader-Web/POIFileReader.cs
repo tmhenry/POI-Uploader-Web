@@ -44,7 +44,7 @@ namespace POI_Uploader_Web
             int offset = 0;
             POIPresentation presentationForRead = new POIPresentation();
             presentationForRead.deserialize(buffer, ref offset);
-            Console.WriteLine("Number of Slide is " + presentationForRead.Count);
+            POIGlobalVar.POIDebugLog("Number of Slide is " + presentationForRead.Count);
         }
         
         

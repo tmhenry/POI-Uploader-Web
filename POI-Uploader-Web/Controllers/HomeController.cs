@@ -70,8 +70,8 @@ namespace POI_Uploader_Web.Controllers
                     param[3] = presInfo["description"];
                     param[4] = pptID.ToString();
 
-                    Thread fileHandler = new Thread(HandleUploadedFile);
-                    fileHandler.Start(param);
+                    //Enqueue the request to the queue
+                    ProcessQueue.EnqueueRequest(param);
                 }
             }
 
@@ -81,38 +81,6 @@ namespace POI_Uploader_Web.Controllers
             return Json(response);
         }
 
-        private void HandleUploadedFile(object arg)
-        {
-            String[] param = arg as String[];
-            String extName = param[0];
-            String savedFn = param[1];
-            String name = param[2];
-            String description = param[3];
-            int presId = Int32.Parse(param[4]);
-
-            Stopwatch uploadTime = new Stopwatch();
-            uploadTime.Start();
-
-            switch (extName)
-            {
-                case @".PDF":
-                case @".pdf":
-                    POIPDFProcessor.Process(savedFn, name, description, presId);
-                    break;
-                case @".PPT":
-                case @".ppt":
-                case @".PPTX":
-                case @".pptx":
-                    POIPPTProcessor.Process(savedFn, name, description, presId);
-                    break;
-                case @".POI":
-                    POIFileReader reader = new POIFileReader(savedFn);
-                    reader.GetImageAndAnimationFromFile();
-                    break;
-            }
-
-            uploadTime.Stop();
-            Console.WriteLine("Time used for uploading:" + uploadTime.Elapsed);
-        }
+        
     }
 }

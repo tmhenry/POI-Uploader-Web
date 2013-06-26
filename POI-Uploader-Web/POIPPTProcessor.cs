@@ -15,6 +15,8 @@ using System.Collections;
 using System.Text.RegularExpressions;
 
 
+using POILibCommunication;
+
 namespace POI_Uploader_Web
 {
     class POIPPTProcessor
@@ -107,7 +109,6 @@ namespace POI_Uploader_Web
                     durationList.Add((int)((totalTime - allButLastDuration)*1000));
 
 
-                    
                     container = myPres.Add(Office.MsoTriState.msoTrue);
                     
                     curSlide.Copy();
@@ -129,7 +130,7 @@ namespace POI_Uploader_Web
                         }
                         catch(Exception e)
                         {
-                            Console.WriteLine("Come on exception!");
+                            POIGlobalVar.POIDebugLog("Come on exception!");
                             Thread.Sleep(1000);
                             continue;
                         }
@@ -163,23 +164,31 @@ namespace POI_Uploader_Web
 
             DateTime endTime = DateTime.Now;
 
-            Console.WriteLine(@"Time consumed in seconds: " + (endTime - startTime).TotalSeconds);
+            POIGlobalVar.POIDebugLog(@"Time consumed in seconds: " + (endTime - startTime).TotalSeconds);
 
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            
+            Marshal.ReleaseComObject(myPres);
+            
+            //GC.Collect();
+            //GC.WaitForPendingFinalizers();
 
             
 
             sourcePre.Close();
+            Marshal.ReleaseComObject(sourcePre);
 
             saver.uploadSlideKeywordsToServer();
             saver.saveToPOIFile();
 
+            /*
             foreach (Process process in System.Diagnostics.Process.GetProcessesByName("POWERPNT.EXE"))
             {
                 process.Kill();
-            }
+            }*/
+
+            
             myApp.Quit();
+            Marshal.ReleaseComObject(myApp);
             
         }
 
@@ -315,7 +324,7 @@ namespace POI_Uploader_Web
                 fs.Close();
 
                 counter++;
-                Console.WriteLine(counter);
+                POIGlobalVar.POIDebugLog(counter);
                 Thread.Sleep(1);
             }
         }

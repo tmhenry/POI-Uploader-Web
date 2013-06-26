@@ -83,7 +83,7 @@ namespace POI_Uploader_Web
             //Upload to the content server
             POIContentServerHelper.uploadContent(presentation.PresID, fileName);
 
-            Console.WriteLine("presID of slides is" + presentation.PresID);
+            POIGlobalVar.POIDebugLog("presID of slides is" + presentation.PresID);
         }
    
     }

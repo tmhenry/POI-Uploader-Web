@@ -9,6 +9,7 @@ using System.Threading;
 //For using win32 API
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
+using POILibCommunication;
 
 namespace Communication
 {
@@ -92,8 +93,8 @@ namespace Communication
                 if (myProcess != null) break;
             }
 
-            Console.WriteLine("Return process: " + myProcess.Id);
-            Console.WriteLine("Return process: " + myProcess.MainWindowTitle);
+            POIGlobalVar.POIDebugLog("Return process: " + myProcess.Id);
+            POIGlobalVar.POIDebugLog("Return process: " + myProcess.MainWindowTitle);
 
             return myProcess;
         }

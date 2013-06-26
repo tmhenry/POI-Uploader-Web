@@ -21,6 +21,10 @@ namespace POI_Uploader_Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            ProcessQueue.Run(POIUploadHandler.HandleUploadedFile);
         }
+
+        
     }
 }

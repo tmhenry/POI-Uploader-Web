@@ -7,6 +7,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Drawing;
+using POILibCommunication;
 
 namespace Communication
 {
@@ -46,7 +47,7 @@ namespace Communication
             input_move.mi.dx = (int)Math.Round(x * (65535 / ScreenWidth), 0);
             input_move.mi.dy = (int)Math.Round(y * (65535 / ScreenHeight), 0);
 
-            Console.WriteLine(input_move.mi.dx + " " + input_move.mi.dy);
+            POIGlobalVar.POIDebugLog(input_move.mi.dx + " " + input_move.mi.dy);
 
             input_move.mi.mouseData = 0;
             input_move.mi.dwFlags = (int)(MOUSEEVENTF.MOVE | MOUSEEVENTF.ABSOLUTE);
