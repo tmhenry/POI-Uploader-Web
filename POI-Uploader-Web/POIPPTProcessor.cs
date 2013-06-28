@@ -34,7 +34,7 @@ namespace POI_Uploader_Web
             saver = new POISlideSaver(name, description, presId);
             
             folderPath = saver.FolderPath;
-            
+
             PowerPoint.Application myApp = new PowerPoint.Application();
             PowerPoint.Presentations myPres = myApp.Presentations;
             
@@ -67,7 +67,8 @@ namespace POI_Uploader_Web
                 os.Close();
 
 
-                GetTextCommentsOnEachSlideAndStoreToFile(curSlide);
+                //GetTextCommentsOnEachSlideAndStoreToFile(curSlide);
+                saveTextCommentsOnSlide(curSlide, curSlide.SlideIndex - 1);
 
                 int animationCount = curSlide.TimeLine.MainSequence.Count;
                 if (animationCount > 0)
@@ -187,9 +188,32 @@ namespace POI_Uploader_Web
             }*/
 
             
-            myApp.Quit();
+            //myApp.Quit();
             Marshal.ReleaseComObject(myApp);
             
+        }
+
+        private static void saveTextCommentsOnSlide(PowerPoint.Slide slide, int slideIndex)
+        {
+            String finalKeyword = "";
+            PowerPoint.Shapes shapes = slide.Shapes;
+
+            foreach (PowerPoint.Shape shape in shapes)
+            {
+                if (shape.HasTextFrame == Office.MsoTriState.msoTrue)
+                {
+                    String text = shape.TextFrame.TextRange.Text;
+
+                    text = ReplaceNoAlphanumericWithSpace(text);
+
+                    if (!String.IsNullOrWhiteSpace(text))
+                    {
+                        finalKeyword = finalKeyword + " " + text;
+                    }
+                }
+            }
+
+            saver.saveSlideKewordIntoPresentation(slideIndex, finalKeyword);
         }
 
         private static void GetTextCommentsOnEachSlideAndStoreToFile(PowerPoint.Slide slide)
@@ -205,6 +229,8 @@ namespace POI_Uploader_Web
                 }
             }
         }
+
+
         private static void StoreStringToFileWithPresIDAndIndex(int index,string text)
         {
             

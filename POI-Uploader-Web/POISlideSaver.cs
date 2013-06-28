@@ -16,6 +16,7 @@ namespace POI_Uploader_Web
         POIPresentation presentation;
         string name;
         string presentor;
+        Dictionary<string, string> keywordDict;
         
         public string FolderPath
         {
@@ -27,7 +28,6 @@ namespace POI_Uploader_Web
             //pptID = POIWebService.UploadPresentation(presName, description);
             pptID = presId;
 
-
             folderPath = Path.Combine(POIArchive.ArchiveHome, pptID.ToString()); 
             Directory.CreateDirectory(folderPath);
 
@@ -35,6 +35,7 @@ namespace POI_Uploader_Web
             presentor = description;
 
             presentation = new POIPresentation(pptID, name, description);
+            keywordDict = new Dictionary<string, string>();
         }
         public  void saveSlideImageToPresentation(int slideIndex)
         {
@@ -55,6 +56,18 @@ namespace POI_Uploader_Web
 
             POIContentServerHelper.uploadContent(presentation.PresID, savedAnimationName);
             POIContentServerHelper.uploadContent(presentation.PresID, savedCoverName);
+        }
+
+        public void saveSlideKewordIntoPresentation(int slideIndex, string keyword)
+        {
+            try
+            {
+                keywordDict.Add(pptID + "_" + slideIndex, keyword);
+            }
+            catch (Exception e)
+            {
+                POIGlobalVar.POIDebugLog(e);
+            }
         }
 
         public void uploadSlideKeywordsToServer()
@@ -82,7 +95,7 @@ namespace POI_Uploader_Web
 
             //Upload to the content server
             POIContentServerHelper.uploadContent(presentation.PresID, fileName);
-
+            POIWebService.UploadKeyword(keywordDict);
             POIGlobalVar.POIDebugLog("presID of slides is" + presentation.PresID);
         }
    
