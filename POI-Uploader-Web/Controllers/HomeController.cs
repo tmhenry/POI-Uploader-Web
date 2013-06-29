@@ -17,6 +17,7 @@ namespace POI_Uploader_Web.Controllers
         
         public ActionResult UploadPresentation()
         {
+            /*
             Dictionary<string, string> presInfo = new Dictionary<string, string>();
 
             presInfo["name"] = "unknown";
@@ -42,9 +43,15 @@ namespace POI_Uploader_Web.Controllers
             if (Request.Form.AllKeys.Contains("type"))
             {
                 presInfo["type"] = Request.Form["type"];
-            }
+            }*/
 
-            int pptID = POIWebService.UploadPresentation(presInfo);
+            //int pptID = POIWebService.UploadPresentation(presInfo);
+
+            int pptID = -1;
+            if (Request.Form.AllKeys.Contains("pid"))
+            {
+                pptID = Int32.Parse(Request.Form["pid"]);
+            }
 
             if (pptID > 0)
             {
@@ -66,8 +73,10 @@ namespace POI_Uploader_Web.Controllers
                     String[] param = new String[5];
                     param[0] = Path.GetExtension(presFn);
                     param[1] = savedFn;
-                    param[2] = presInfo["name"];
-                    param[3] = presInfo["description"];
+                    //param[2] = presInfo["name"];
+                    param[2] = "name";
+                    //param[3] = presInfo["description"];
+                    param[3] = "description";
                     param[4] = pptID.ToString();
 
                     //Enqueue the request to the queue
