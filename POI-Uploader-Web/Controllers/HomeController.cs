@@ -53,6 +53,8 @@ namespace POI_Uploader_Web.Controllers
                 pptID = Int32.Parse(Request.Form["pid"]);
             }
 
+            pptID = 52111;
+
             if (pptID > 0)
             {
                 foreach (string file in Request.Files)

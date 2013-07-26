@@ -16,9 +16,11 @@ namespace POI_Uploader_Web
     class POIPDFProcessor
     {
         static POISlideSaver saver;
+        static string inputPdf;
+        static string folderPath;
+
         public static void Process(String fn,string name, string description, int presId)
         {
-
             saver = new POISlideSaver(name, description, presId);
             //Determine the page count
             StreamReader sr = new StreamReader(File.OpenRead(fn));
@@ -27,42 +29,42 @@ namespace POI_Uploader_Web
             int numPages = matches.Count;
             sr.Close();
 
+            folderPath = saver.FolderPath;
+            inputPdf = fn;
             
-            
-            //Start a PDF process and set to full screen mode
-            ManipulateProcess.StartProcess(fn);
-
-            //Get the index of the file name without the path
-            int fnStartIndex = fn.LastIndexOf('\\') + 1; 
-
-            //Process pdfProcess = ManipulateProcess.GetProcess(@"PDF");
-            Process pdfProcess = ManipulateProcess.GetPdfProcess(fn.Substring(fnStartIndex));
-            ManipulateProcess.SetForeGround(pdfProcess);
-            EmulateIO.KeyStroke(@"^l");
-
-            MemoryStream myStream;
-            FileStream fs;
-            String path = Directory.GetCurrentDirectory();
-
+            //Convert each page to image
             for (int i = 0; i < numPages; i++)
             {
-                ManipulateProcess.SetForeGround(pdfProcess);
-                EmulateIO.KeyStroke(@"{PGDN}");
-
-                Thread.Sleep(100);
-
-                //Take the screen shot  q
-                myStream = ScreenShot.TakeScreenShot(pdfProcess);
-                String savedFileName = saver.FolderPath + @"/" + i + @".png";
-                fs = File.OpenWrite(savedFileName);
-                myStream.WriteTo(fs);
-                fs.Close();
+                //Convert the slide into png
+                startPdfToPngConversion(i);
+    
                 saver.saveSlideImageToPresentation(i);
-
-                
             }
-            pdfProcess.CloseMainWindow();
+            
             saver.saveToPOIFile();
+        }
+
+        public static void startPdfToPngConversion(int slideIndex)
+        {
+            string outputFN = Path.Combine(folderPath, slideIndex + ".png");
+
+            //Start a cmd process which trigger ffmpeg
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+            startInfo.FileName = "cmd.exe";
+
+            int pageIndex = slideIndex + 1;
+            startInfo.Arguments = "/C gswin64c -dNOPAUSE -dBATCH -dNOPROMPT"
+                + " -dFirstPage=" + pageIndex
+                + " -dLastPage=" + pageIndex
+                + " -sDEVICE=pngalpha -r96 -sOutputFile=" + outputFN
+                + " " + inputPdf;
+
+            process.StartInfo = startInfo;
+            process.Start();
+
+            process.WaitForExit();
         }
     }
 }
