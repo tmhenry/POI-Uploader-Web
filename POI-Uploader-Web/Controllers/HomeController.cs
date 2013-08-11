@@ -10,10 +10,26 @@ using Communication;
 using System.Threading;
 using System.Diagnostics;
 
+using POI_Uploader_Web.Models;
+
 namespace POI_Uploader_Web.Controllers
 {
     public class HomeController : Controller
     {
+         // GET: /Home/
+        public ActionResult Index()
+        {
+          
+            HomeViewModel model = new HomeViewModel
+            {
+                Name = "POIUploader",
+                Uploader = POIGlobalVar.Uploader,
+                ContentServer = POIGlobalVar.ContentServerHome,
+                DNSServer = POIGlobalVar.DNSServerHome,
+            };
+
+            return View(model);
+        }
         
         public ActionResult UploadPresentation()
         {
@@ -53,7 +69,7 @@ namespace POI_Uploader_Web.Controllers
                 pptID = Int32.Parse(Request.Form["pid"]);
             }
 
-            pptID = 52111;
+            //pptID = 52111;
 
             if (pptID > 0)
             {
@@ -68,6 +84,8 @@ namespace POI_Uploader_Web.Controllers
                     String presFn = Path.GetFileName(hpf.FileName);
 
                     String savedFn = Path.Combine(POIArchive.ArchiveHome, presFn);
+
+                    POIGlobalVar.POIDebugLog(savedFn);
 
                     hpf.SaveAs(savedFn);
 

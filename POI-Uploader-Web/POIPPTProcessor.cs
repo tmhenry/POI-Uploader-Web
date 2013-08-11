@@ -178,7 +178,7 @@ namespace POI_Uploader_Web
             sourcePre.Close();
             Marshal.ReleaseComObject(sourcePre);
 
-            saver.uploadSlideKeywordsToServer();
+            //saver.uploadSlideKeywordsToServer();
             saver.saveToPOIFile();
 
             /*

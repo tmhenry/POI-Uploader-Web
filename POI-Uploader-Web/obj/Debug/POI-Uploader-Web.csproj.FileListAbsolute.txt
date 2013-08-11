@@ -150,3 +150,14 @@ C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\System.Web.Razor
 C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\System.Web.WebPages.xml
 C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\System.Web.WebPages.Deployment.xml
 C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\System.Web.WebPages.Razor.xml
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\itextsharp.dll
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\itextsharp.xml
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.AspNet.SignalR.Core.dll
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.AspNet.SignalR.Owin.dll
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Owin.dll
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.AspNet.SignalR.Core.xml
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.AspNet.SignalR.Owin.xml
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.AspNet.SignalR.SystemWeb.xml
+C:\Users\HenryXia\Desktop\POI-Uploader-Web\POI-Uploader-Web\bin\Microsoft.Owin.Host.SystemWeb.xml

@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script> 
+    <script src="http://malsup.github.com/jquery.form.js"></script> 
+    <script src="Scripts/jquery.signalR-1.1.1.min.js"></script>
+    <script src="@(Model.Uploader)/signalr/hubs"></script>
+
+    <link rel="stylesheet" href="css/screen.css">
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css">
+ 
+    <script>
+        // wait for the DOM to be loaded 
+        $(document).ready(function () {
+            $.connection.hub.url = "@(Model.Uploader)/signalr/";
+            
+            poiUploader = $.connection.poiUploader;
+            poiUploader.client.logMessage = function (message) {
+                var curLog = $('#ServerLog').val();
+                $('#ServerLog').val(message + "\\\n" + curLog);
+            };
+
+            $.connection.hub.start().done(function () {
+                poiUploader.server.log("Hub started!");
+            });
+        });
+    </script> 
+</head>
+<body>
+    <div>
+        @RenderBody()
+    </div>
+</body>
+</html>

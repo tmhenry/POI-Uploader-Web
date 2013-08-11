@@ -10,6 +10,9 @@ using System.Threading;
 using System.IO;
 
 using POILibCommunication;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using iTextSharp.text.pdf.parser;
 
 namespace POI_Uploader_Web
 {
@@ -21,27 +24,41 @@ namespace POI_Uploader_Web
 
         public static void Process(String fn,string name, string description, int presId)
         {
+            int numPages = 0;
             saver = new POISlideSaver(name, description, presId);
-            //Determine the page count
-            StreamReader sr = new StreamReader(File.OpenRead(fn));
-            Regex regex = new Regex(@"/Type\s*/Page[^s]");
-            MatchCollection matches = regex.Matches(sr.ReadToEnd());
-            int numPages = matches.Count;
-            sr.Close();
 
             folderPath = saver.FolderPath;
             inputPdf = fn;
-            
-            //Convert each page to image
-            for (int i = 0; i < numPages; i++)
+
+            //Use pdf reader to extract information
+            try
             {
-                //Convert the slide into png
-                startPdfToPngConversion(i);
-    
-                saver.saveSlideImageToPresentation(i);
+                PdfReader reader = new PdfReader(fn);
+                numPages = reader.NumberOfPages;
+
+                PdfReaderContentParser parser = new PdfReaderContentParser(reader);
+                
+                for (int i = 0; i < numPages; i++)
+                {
+                    string pageText = parser.ProcessContent(
+                        i + 1, 
+                        new SimpleTextExtractionStrategy()
+                    ).GetResultantText();
+
+                    Console.WriteLine("temp");
+
+                    //Convert the slide into png
+                    startPdfToPngConversion(i);
+                    saver.saveSlideImageToPresentation(i);
+                }
+
+                saver.saveToPOIFile();
+            }
+            catch (Exception e)
+            {
+                POIGlobalVar.POIDebugLog(e);
             }
             
-            saver.saveToPOIFile();
         }
 
         public static void startPdfToPngConversion(int slideIndex)
@@ -53,6 +70,7 @@ namespace POI_Uploader_Web
             ProcessStartInfo startInfo = new ProcessStartInfo();
             startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
             startInfo.FileName = "cmd.exe";
+            startInfo.Verb = "runas";
 
             int pageIndex = slideIndex + 1;
             startInfo.Arguments = "/C gswin64c -dNOPAUSE -dBATCH -dNOPROMPT"
@@ -61,9 +79,10 @@ namespace POI_Uploader_Web
                 + " -sDEVICE=pngalpha -r96 -sOutputFile=" + outputFN
                 + " " + inputPdf;
 
+            POIGlobalVar.POIDebugLog(startInfo.Arguments);
+
             process.StartInfo = startInfo;
             process.Start();
-
             process.WaitForExit();
         }
     }

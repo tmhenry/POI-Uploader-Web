@@ -10,6 +10,8 @@ using System.Web.Routing;
 using POILibCommunication;
 using System.Web.Configuration;
 
+using Microsoft.AspNet.SignalR;
+
 namespace POI_Uploader_Web
 {
     // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
@@ -20,6 +22,8 @@ namespace POI_Uploader_Web
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+
+            RouteTable.Routes.MapHubs();
 
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -36,10 +40,11 @@ namespace POI_Uploader_Web
 
             try
             {
+                POIGlobalVar.logDelegate = new POIUploaderLogHandler();
+
                 POIGlobalVar.ContentServerHome = WebConfigurationManager.AppSettings["ContentServer"];
                 POIGlobalVar.DNSServerHome = WebConfigurationManager.AppSettings["DNSServer"];
-                POIGlobalVar.ProxyServerIP = WebConfigurationManager.AppSettings["ProxyServerIP"];
-                POIGlobalVar.ProxyServerPort = Int32.Parse(WebConfigurationManager.AppSettings["ProxyServerPort"]);
+                POIGlobalVar.Uploader = WebConfigurationManager.AppSettings["Uploader"];
 
                 //POIGlobalVar.POIDebugLog(POIGlobalVar.ContentServerHome);
 
