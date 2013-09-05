@@ -45,7 +45,12 @@ namespace POI_Uploader_Web
                         new SimpleTextExtractionStrategy()
                     ).GetResultantText();
 
-                    Console.WriteLine("temp");
+                    pageText = ReplaceNoAlphanumericWithSpace(pageText);
+                    //byte[] bytes = Encoding.Default.GetBytes(pageText);
+                    //pageText = Encoding.UTF8.GetString(bytes);
+
+                    //Save the slide keywords into database
+                    saver.saveSlideKewordIntoPresentation(i, pageText);
 
                     //Convert the slide into png
                     startPdfToPngConversion(i);
@@ -60,6 +65,16 @@ namespace POI_Uploader_Web
             }
             
         }
+
+        private static string ReplaceNoAlphanumericWithSpace(string text)
+        {
+            text = text.Replace(System.Environment.NewLine, " ").Replace("\r", " ");
+            Regex rgx = new Regex(@"[^\p{L}a-zA-Z0-9 -]");
+            text = rgx.Replace(text, " ");
+
+            return text;
+        }
+
 
         public static void startPdfToPngConversion(int slideIndex)
         {

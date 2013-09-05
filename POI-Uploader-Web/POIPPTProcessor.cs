@@ -30,166 +30,172 @@ namespace POI_Uploader_Web
         public static void Process(String fn,string name, string description, int presId)
         {
             presID = presId;
-
             saver = new POISlideSaver(name, description, presId);
-            
             folderPath = saver.FolderPath;
 
-            PowerPoint.Application myApp = new PowerPoint.Application();
-            PowerPoint.Presentations myPres = myApp.Presentations;
-            
+            POIGlobalVar.POIDebugLog("Processing pid " + presId + "in folder " + folderPath);
 
-            //Open a certain PPT
-            PowerPoint.Presentation sourcePre = myPres.Open(fn, Office.MsoTriState.msoFalse, Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse);
-            PowerPoint.Presentation container;
-
-
-            
-            String fileName;
-            DateTime startTime = DateTime.Now;
-
-            sourcePre.SaveAs(folderPath, PowerPoint.PpSaveAsFileType.ppSaveAsPNG);
-            keywordsFileName = Path.Combine(folderPath, presID.ToString() + POIGlobalVar.KeywordsFileType);
-
-            foreach (PowerPoint.Slide curSlide in sourcePre.Slides)
+            try
             {
-                List<int> durationList = new List<int>();
-                fileName = folderPath + "/" + (curSlide.SlideIndex-1)+".PNG";;
-                string savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex)+".PNG";
-                FileStream ins = new FileStream(savedFileName, FileMode.Open, FileAccess.Read);
-                FileStream os = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
-
-                //Copy to the local disk
-                ins.CopyTo(os);
-                os.Flush();
-
-                ins.Close();
-                os.Close();
+                PowerPoint.Application myApp = new PowerPoint.Application();
+                PowerPoint.Presentations myPres = myApp.Presentations;
 
 
-                //GetTextCommentsOnEachSlideAndStoreToFile(curSlide);
-                saveTextCommentsOnSlide(curSlide, curSlide.SlideIndex - 1);
+                //Open a certain PPT
+                PowerPoint.Presentation sourcePre = myPres.Open(fn, Office.MsoTriState.msoFalse, Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse);
+                PowerPoint.Presentation container;
 
-                int animationCount = curSlide.TimeLine.MainSequence.Count;
-                if (animationCount > 0)
+                String fileName;
+                DateTime startTime = DateTime.Now;
+
+                sourcePre.SaveAs(folderPath, PowerPoint.PpSaveAsFileType.ppSaveAsPNG);
+                keywordsFileName = Path.Combine(folderPath, presID.ToString() + POIGlobalVar.KeywordsFileType);
+
+                foreach (PowerPoint.Slide curSlide in sourcePre.Slides)
                 {
-                    PowerPoint.Sequence curAnimationSequence = curSlide.TimeLine.MainSequence;
-                    float totalTime = 0;
-                    float curDuration = 0;
-                    float allButLastDuration = 0;
-                    System.Collections.IEnumerator enumerator = curAnimationSequence.GetEnumerator();
+                    List<int> durationList = new List<int>();
+                    fileName = folderPath + "/" + (curSlide.SlideIndex - 1) + ".PNG"; ;
+                    string savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex) + ".PNG";
+                    FileStream ins = new FileStream(savedFileName, FileMode.Open, FileAccess.Read);
+                    FileStream os = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
 
-                    FileStream stream = new FileStream(Path.Combine(POIArchive.ArchiveHome, "effect.txt"),FileMode.Create);
-                    StreamWriter writer = new StreamWriter(stream);
+                    //Copy to the local disk
+                    ins.CopyTo(os);
+                    os.Flush();
 
-                    foreach (PowerPoint.Effect effect in curAnimationSequence)
+                    ins.Close();
+                    os.Close();
+
+
+                    //GetTextCommentsOnEachSlideAndStoreToFile(curSlide);
+                    saveTextCommentsOnSlide(curSlide, curSlide.SlideIndex - 1);
+
+                    int animationCount = curSlide.TimeLine.MainSequence.Count;
+                    if (animationCount > 0)
                     {
-                        writer.WriteLine(effect.Timing.TriggerType+"   "+effect.Timing.Duration+"  "+effect.Timing.TriggerDelayTime);
+                        PowerPoint.Sequence curAnimationSequence = curSlide.TimeLine.MainSequence;
+                        float totalTime = 0;
+                        float curDuration = 0;
+                        float allButLastDuration = 0;
+                        System.Collections.IEnumerator enumerator = curAnimationSequence.GetEnumerator();
 
-                        if (curDuration == 0)
+                        FileStream stream = new FileStream(Path.Combine(POIArchive.ArchiveHome, "effect.txt"), FileMode.Create);
+                        StreamWriter writer = new StreamWriter(stream);
+
+                        foreach (PowerPoint.Effect effect in curAnimationSequence)
                         {
-                            curDuration += effect.Timing.Duration;
-                        }
-                        else
-                        {
-                            if (effect.Timing.TriggerType == PowerPoint.MsoAnimTriggerType.msoAnimTriggerOnPageClick)
+                            writer.WriteLine(effect.Timing.TriggerType + "   " + effect.Timing.Duration + "  " + effect.Timing.TriggerDelayTime);
+
+                            if (curDuration == 0)
                             {
-                                durationList.Add((int)(curDuration*1000));
-                                allButLastDuration += curDuration;
-                                curDuration = 0;
-                            }
-
-                            curDuration += effect.Timing.Duration;
-                        }
-
-                        totalTime += effect.Timing.Duration;
-                    }
-
-                    writer.Close();
-                    stream.Close();
-                    durationList.Add((int)((totalTime - allButLastDuration)*1000));
-
-
-                    container = myPres.Add(Office.MsoTriState.msoTrue);
-                    
-                    curSlide.Copy();
-                    container.Windows[1].Activate();
-                    myApp.CommandBars.ExecuteMso(@"PasteSourceFormatting");
-
-                    container.CreateVideo(folderPath + "/" + (curSlide.SlideIndex-1)+".wmv", true, (int)Math.Ceiling(totalTime));
-                    while (true)
-                    {
-                        try{
-                            if(container.CreateVideoStatus != PowerPoint.PpMediaTaskStatus.ppMediaTaskStatusDone)
-                            {
-                                Thread.Sleep(1000);
+                                curDuration += effect.Timing.Duration;
                             }
                             else
                             {
-                                break;
+                                if (effect.Timing.TriggerType == PowerPoint.MsoAnimTriggerType.msoAnimTriggerOnPageClick)
+                                {
+                                    durationList.Add((int)(curDuration * 1000));
+                                    allButLastDuration += curDuration;
+                                    curDuration = 0;
+                                }
+
+                                curDuration += effect.Timing.Duration;
                             }
+
+                            totalTime += effect.Timing.Duration;
                         }
-                        catch(Exception e)
+
+                        writer.Close();
+                        stream.Close();
+                        durationList.Add((int)((totalTime - allButLastDuration) * 1000));
+
+
+                        container = myPres.Add(Office.MsoTriState.msoTrue);
+
+                        curSlide.Copy();
+                        container.Windows[1].Activate();
+                        myApp.CommandBars.ExecuteMso(@"PasteSourceFormatting");
+
+                        container.CreateVideo(folderPath + "/" + (curSlide.SlideIndex - 1) + ".wmv", true, (int)Math.Ceiling(totalTime));
+                        while (true)
                         {
-                            POIGlobalVar.POIDebugLog("Come on exception!");
-                            Thread.Sleep(1000);
-                            continue;
+                            try
+                            {
+                                if (container.CreateVideoStatus != PowerPoint.PpMediaTaskStatus.ppMediaTaskStatusDone)
+                                {
+                                    Thread.Sleep(1000);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                POIGlobalVar.POIDebugLog("Come on exception!");
+                                Thread.Sleep(1000);
+                                continue;
+                            }
+
                         }
-                        
+
+                        container.Close();
+
+                        //Once the video creation is done, convert it to wmv, wait until completion
+                        String[] param = new String[2];
+                        param[0] = folderPath;
+                        param[1] = (curSlide.SlideIndex - 1).ToString();
+                        StartVideoConversion(param);
+                        //GetMouseClickImageFromSlideAccordingToTime(curSlide.SlideIndex, durationList,(int)totalTime);
+
                     }
 
-                    container.Close();
 
-                    //Once the video creation is done, convert it to wmv, wait until completion
-                    String [] param = new String[2];
-                    param[0] = folderPath;
-                    param[1] = (curSlide.SlideIndex-1).ToString();
-                    StartVideoConversion(param);
-                    //GetMouseClickImageFromSlideAccordingToTime(curSlide.SlideIndex, durationList,(int)totalTime);
-                 
+                    if (animationCount > 0)
+                    {
+                        saver.saveSlideAnimationToPresentation(curSlide.SlideIndex - 1, durationList);
+                    }
+                    else
+                    {
+                        saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
+                    }
+
+
+
                 }
-            
-                
-                if (animationCount > 0)
+
+                DateTime endTime = DateTime.Now;
+
+                POIGlobalVar.POIDebugLog(@"Time consumed in seconds: " + (endTime - startTime).TotalSeconds);
+
+
+                Marshal.ReleaseComObject(myPres);
+
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
+
+
+
+                sourcePre.Close();
+                Marshal.ReleaseComObject(sourcePre);
+
+                //saver.uploadSlideKeywordsToServer();
+                saver.saveToPOIFile();
+
+                /*
+                foreach (Process process in System.Diagnostics.Process.GetProcessesByName("POWERPNT.EXE"))
                 {
-                    saver.saveSlideAnimationToPresentation(curSlide.SlideIndex - 1, durationList);
-                }
-                else
-                {
-                    saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
-                }
+                    process.Kill();
+                }*/
 
 
-                
+                //myApp.Quit();
+                Marshal.ReleaseComObject(myApp);
             }
-
-            DateTime endTime = DateTime.Now;
-
-            POIGlobalVar.POIDebugLog(@"Time consumed in seconds: " + (endTime - startTime).TotalSeconds);
-
-            
-            Marshal.ReleaseComObject(myPres);
-            
-            //GC.Collect();
-            //GC.WaitForPendingFinalizers();
-
-            
-
-            sourcePre.Close();
-            Marshal.ReleaseComObject(sourcePre);
-
-            //saver.uploadSlideKeywordsToServer();
-            saver.saveToPOIFile();
-
-            /*
-            foreach (Process process in System.Diagnostics.Process.GetProcessesByName("POWERPNT.EXE"))
+            catch (Exception e)
             {
-                process.Kill();
-            }*/
-
-            
-            //myApp.Quit();
-            Marshal.ReleaseComObject(myApp);
+                POIGlobalVar.POIDebugLog(e.Message);
+            }
             
         }
 
@@ -213,6 +219,8 @@ namespace POI_Uploader_Web
                 }
             }
 
+            //byte[] bytes = Encoding.Default.GetBytes(finalKeyword);
+            //finalKeyword = Encoding.UTF8.GetString(bytes);
             saver.saveSlideKewordIntoPresentation(slideIndex, finalKeyword);
         }
 
@@ -256,7 +264,7 @@ namespace POI_Uploader_Web
         private static string ReplaceNoAlphanumericWithSpace(string text)
         {
             text = text.Replace(System.Environment.NewLine, " ").Replace("\r", " ");
-            Regex rgx = new Regex("[^a-zA-Z0-9 -]");
+            Regex rgx = new Regex(@"[^\p{L}a-zA-Z0-9 -]");
             text = rgx.Replace(text, " ");
 
             return text;

@@ -97,6 +97,21 @@ namespace POI_Uploader_Web
             POIContentServerHelper.uploadContent(presentation.PresID, fileName);
             POIWebService.UploadKeyword(keywordDict);
             POIGlobalVar.POIDebugLog("presID of slides is" + presentation.PresID);
+
+            //Create an empty session
+            //Get a new session ID from the DNS server
+            Dictionary<string, string> reqDict = new Dictionary<string, string>();
+            reqDict["creator"] = "system_default";
+            reqDict["presId"] = presentation.PresID.ToString();
+            reqDict["type"] = "public";
+            int sessionId = POIWebService.CreateSession(reqDict);
+
+            POIGlobalVar.POIDebugLog("sessionID is " + sessionId);
+
+            reqDict = new Dictionary<string, string>();
+            reqDict["userId"] = "system_default";
+            reqDict["sessionId"] = sessionId.ToString();
+            POIWebService.EndSession(reqDict);
         }
    
     }
