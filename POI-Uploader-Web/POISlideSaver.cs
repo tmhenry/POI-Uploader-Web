@@ -104,6 +104,7 @@ namespace POI_Uploader_Web
             reqDict["creator"] = "system_default";
             reqDict["presId"] = presentation.PresID.ToString();
             reqDict["type"] = "public";
+            reqDict["status"] = "waiting";
             int sessionId = POIWebService.CreateSession(reqDict);
 
             POIGlobalVar.POIDebugLog("sessionID is " + sessionId);
