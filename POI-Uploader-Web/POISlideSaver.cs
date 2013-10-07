@@ -6,6 +6,8 @@ using POILibCommunication;
 using System.Threading;
 using System.IO;
 
+using System.Web.Script.Serialization;
+
 namespace POI_Uploader_Web
 {
     class POISlideSaver
@@ -93,10 +95,30 @@ namespace POI_Uploader_Web
 
             writeStream.Close();
 
-            //Upload to the content server
+            //Upload the byte data to the content server
             POIContentServerHelper.uploadContent(presentation.PresID, fileName);
             POIWebService.UploadKeyword(keywordDict);
             POIGlobalVar.POIDebugLog("presID of slides is" + presentation.PresID);
+
+            //Upload the json data to the content server
+            try
+            {
+                string jsonFn = Path.Combine(folderPath, pptID + ".POI.json");
+               
+                using (StreamWriter writer = new StreamWriter(jsonFn))
+                {
+                    JavaScriptSerializer js = new JavaScriptSerializer();
+                    writer.Write(js.Serialize(presentation));
+                }
+
+                //Upload the .json to the content server
+                POIContentServerHelper.uploadContent(presentation.PresID, jsonFn);
+            }
+            catch (Exception e)
+            {
+                POIGlobalVar.POIDebugLog("In writing .POI.json: " + e.Message);
+            }
+            
 
             //Create an empty session
             //Get a new session ID from the DNS server
