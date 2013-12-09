@@ -27,7 +27,7 @@ namespace POI_Uploader_Web
         static int presID;
         static String keywordsFileName;
         
-        public static void Process(String fn,string name, string description, int presId)
+        public static void Process(String fn,string name, string description, int presId, string uploadType)
         {
             presID = presId;
             saver = new POISlideSaver(name, description, presId);
@@ -45,7 +45,7 @@ namespace POI_Uploader_Web
                 PowerPoint.Presentation sourcePre = myPres.Open(fn, Office.MsoTriState.msoFalse, Office.MsoTriState.msoTrue, Office.MsoTriState.msoFalse);
                 PowerPoint.Presentation container;
 
-                String fileName;
+                String fileName, savedFileName;
                 DateTime startTime = DateTime.Now;
 
                 sourcePre.SaveAs(folderPath, PowerPoint.PpSaveAsFileType.ppSaveAsPNG);
@@ -53,9 +53,57 @@ namespace POI_Uploader_Web
 
                 foreach (PowerPoint.Slide curSlide in sourcePre.Slides)
                 {
+                    //For special tutorial with 2-page template
+                    if (uploadType == "tutorial")
+                    {
+                        if (curSlide.SlideIndex == 1)
+                        {
+                            savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex) + ".PNG";
+
+                            fileName = folderPath + "/cover.PNG";
+                            File.Copy(savedFileName, fileName);
+
+                            fileName = folderPath + "/" + (curSlide.SlideIndex - 1) + ".PNG";
+                            File.Copy(savedFileName, fileName);
+                        }
+                        else if (curSlide.SlideIndex == 2)
+                        {
+                            savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex) + ".PNG";
+
+                            fileName = folderPath + "/question.PNG";
+                            File.Copy(savedFileName, fileName);
+
+                            fileName = folderPath + "/" + (curSlide.SlideIndex - 1) + ".PNG";
+                            File.Copy(savedFileName, fileName);
+                        }
+                        else if (curSlide.SlideIndex == 3)
+                        {
+                            savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex) + ".PNG";
+
+                            fileName = folderPath + "/answer.PNG";
+                            File.Copy(savedFileName, fileName);
+
+                            fileName = folderPath + "/" + (curSlide.SlideIndex - 1) + ".PNG";
+                            File.Copy(savedFileName, fileName);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        //Set the saved file name
+                        savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex) + ".PNG";
+                        fileName = folderPath + "/" + (curSlide.SlideIndex - 1) + ".PNG";
+                        File.Copy(savedFileName, fileName);
+                    }
+
                     List<int> durationList = new List<int>();
-                    fileName = folderPath + "/" + (curSlide.SlideIndex - 1) + ".PNG"; ;
-                    string savedFileName = folderPath + "/Slide" + (curSlide.SlideIndex) + ".PNG";
+
+                    
+
+                    /*
                     FileStream ins = new FileStream(savedFileName, FileMode.Open, FileAccess.Read);
                     FileStream os = new FileStream(fileName, FileMode.OpenOrCreate, FileAccess.Write);
 
@@ -65,7 +113,7 @@ namespace POI_Uploader_Web
 
                     ins.Close();
                     os.Close();
-
+                    */
 
                     //GetTextCommentsOnEachSlideAndStoreToFile(curSlide);
                     saveTextCommentsOnSlide(curSlide, curSlide.SlideIndex - 1);
@@ -157,11 +205,26 @@ namespace POI_Uploader_Web
                     }
                     else
                     {
-                        saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
+                        if (uploadType == "tutorial")
+                        {
+                            if (curSlide.SlideIndex == 1)
+                            {
+                                saver.saveCoverPageToPresentation(curSlide.SlideIndex - 1);
+                            }
+                            else if (curSlide.SlideIndex == 2)
+                            {
+                                saver.saveQuestionPageToPresentation(curSlide.SlideIndex - 1);
+                            }
+                            else if (curSlide.SlideIndex == 3)
+                            {
+                                saver.saveAnswerPageToPresentation(curSlide.SlideIndex - 1);
+                            }
+                        }
+                        else
+                        {
+                            saver.saveSlideImageToPresentation(curSlide.SlideIndex - 1);
+                        }
                     }
-
-
-
                 }
 
                 DateTime endTime = DateTime.Now;

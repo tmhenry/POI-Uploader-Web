@@ -26,6 +26,7 @@ namespace POI_Uploader_Web
             String name = param[2];
             String description = param[3];
             int presId = Int32.Parse(param[4]);
+            String uploadType = param[5];
 
             Stopwatch uploadTime = new Stopwatch();
             uploadTime.Start();
@@ -40,7 +41,7 @@ namespace POI_Uploader_Web
                 case @".ppt":
                 case @".PPTX":
                 case @".pptx":
-                    POIPPTProcessor.Process(savedFn, name, description, presId);
+                    POIPPTProcessor.Process(savedFn, name, description, presId, uploadType);
                     break;
                 case @".POI":
                     POIFileReader reader = new POIFileReader(savedFn);

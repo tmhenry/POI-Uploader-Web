@@ -48,6 +48,46 @@ namespace POI_Uploader_Web
             string savedFileName = Path.Combine(FolderPath, slideIndex.ToString() + ".PNG");
             POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
         }
+
+        public void saveCoverPageToPresentation(int slideIndex)
+        {
+            POIStaticSlide slide = new POIStaticSlide(slideIndex, presentation);
+            presentation.Insert(slide);
+
+            //Upload the image to the content server
+            string savedFileName = Path.Combine(FolderPath, "cover.PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+
+            savedFileName = Path.Combine(FolderPath, slideIndex + ".PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+        }
+
+        public void saveQuestionPageToPresentation(int slideIndex)
+        {
+            POIStaticSlide slide = new POIStaticSlide(slideIndex, presentation);
+            presentation.Insert(slide);
+
+            //Upload the image to the content server
+            string savedFileName = Path.Combine(FolderPath, "question.PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+
+            savedFileName = Path.Combine(FolderPath, slideIndex + ".PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+        }
+
+        public void saveAnswerPageToPresentation(int slideIndex)
+        {
+            POIStaticSlide slide = new POIStaticSlide(slideIndex, presentation);
+            presentation.Insert(slide);
+
+            //Upload the image to the content server
+            string savedFileName = Path.Combine(FolderPath, "answer.PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+
+            savedFileName = Path.Combine(FolderPath, slideIndex + ".PNG");
+            POIContentServerHelper.uploadContent(presentation.PresID, savedFileName);
+        }
+
         public  void saveSlideAnimationToPresentation(int slideIndex, List<int> durationList)
         {
             POIAnimationSlide slide = new POIAnimationSlide(durationList, slideIndex, presentation);
@@ -103,6 +143,7 @@ namespace POI_Uploader_Web
             //Upload the json data to the content server
             try
             {
+                POIGlobalVar.POIDebugLog("Uploading POI.json");
                 string jsonFn = Path.Combine(folderPath, pptID + ".POI.json");
                
                 using (StreamWriter writer = new StreamWriter(jsonFn))

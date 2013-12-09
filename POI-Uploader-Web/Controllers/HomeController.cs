@@ -69,6 +69,11 @@ namespace POI_Uploader_Web.Controllers
                 pptID = Int32.Parse(Request.Form["pid"]);
             }
 
+            string type = "tutorial";
+            if (Request.Form.AllKeys.Contains("type"))
+            {
+                //type = Request.Form["type"];
+            }
             //pptID = 52111;
 
             if (pptID > 0)
@@ -90,7 +95,7 @@ namespace POI_Uploader_Web.Controllers
                     hpf.SaveAs(savedFn);
 
                     //Create a new thread and start handling
-                    String[] param = new String[5];
+                    String[] param = new String[6];
                     param[0] = Path.GetExtension(presFn);
                     param[1] = savedFn;
                     //param[2] = presInfo["name"];
@@ -98,6 +103,7 @@ namespace POI_Uploader_Web.Controllers
                     //param[3] = presInfo["description"];
                     param[3] = "description";
                     param[4] = pptID.ToString();
+                    param[5] = type;
 
                     //Enqueue the request to the queue
                     ProcessQueue.EnqueueRequest(param);
