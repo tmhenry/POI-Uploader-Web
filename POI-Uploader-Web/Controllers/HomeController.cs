@@ -72,9 +72,9 @@ namespace POI_Uploader_Web.Controllers
             string type = "tutorial";
             if (Request.Form.AllKeys.Contains("type"))
             {
-                //type = Request.Form["type"];
+                type = Request.Form["type"];
             }
-            //pptID = 52111;
+            
 
             if (pptID > 0)
             {
