@@ -1,1 +1,13 @@
-DON'T PANIC
+http://forums.iis.net/t/1166203.aspx
+
+On Windows Server 2008 you need to create the following directories to get this to work:
+
+Windows 2008 Server x64: C:\Windows\SysWOW64\config\systemprofile\Desktop
+Windows 2008 Server x86: C:\Windows\System32\config\systemprofile\Desktop
+
+Add write permission to desktop folder and you are done
+
+Change the app pool identity to local system or any other high-previleged account
+make sure the account has the right to write
+
+Done.
